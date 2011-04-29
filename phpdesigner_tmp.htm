@@ -8,8 +8,6 @@ Author: Ared Irawsuk
 Author URI: http://dilhamsoft.com/
 */
 
-define('AREDO_PLUGIN_MODE', true);
-
 function aredo_get_info($show){
 	switch ($show){
 		case 'version':
@@ -48,24 +46,13 @@ function aredo_register_scripts(){
 	wp_register_script('jquery-gmap', $js . '/jquery.gmap.min.js', array('jquery'), '1.1.0', 1);
 }
 
-function aredo_print_js_settings($var_name = 'dthemes', $data=array()){
-	$print = json_encode($data);
-	
-	$output = "var $var_name = $print;";
-	
-	echo "<script type=\"text/javascripts\">$output</script>\n";
-}
+
 
 function aredo_register_metabox($title, $fields, $position='normal', $save_callback=''){
 	$template = new aredoMetaboxTemplate($fields);
 	add_meta_box('aredometabox_' . sanitize_title($title), $title, array(&$template, 'template'), 'appearance_page_dthemes-options', 'normal', 'core');
 }
 
-function aredo_init(){
-	global $aredo_theme;
-	$aredo_theme = new AredoThemeFramework();
-}
-add_action('init', 'aredo_init');
 
 /*####################################
 ** ADMIN
@@ -130,10 +117,11 @@ class AredoThemeFramework{
 	
 	function admin_scripts(){
 		global $page_hook;
-		
-		/* add postbox functionality */
-		
-		echo "<script type=\"text/javascript\">jQuery(document).ready( function($) { postboxes.add_postbox_toggles('$page_hook'); });</script>\n";
+
+<!-- add postbox functionality -->
+<script type="text/javascript">jQuery(document).ready( function($) {
+	postboxes.add_postbox_toggles('<?php echo $page_hook; ?>'); });
+</script>
 	}
 	
 	function admin_page(){
@@ -150,27 +138,9 @@ class AredoThemeFramework{
 		do_action('aredo_admin_page-' . $page_hook, compact($plugin_url, $form, $action, $nonce_action, $theme_options));
 	}
 	
-	function update_option($name, $value){
-		return set_theme_mod($name, $value);
-	}
-	
-	function bulk_save($post, $fields){
-	
-		foreach ($fields as $section => $fields){
-			foreach ($fields as $save){
-				$name = $save['name'];
-				$value = $post[$name];
-								
-				if (isset($value)){
-					$this->update_option($name, $value);
-				}
-			}
-		}
-	}
-	
 }
 
 
-
+$dilhamsoft_themes = new DilhamsoftThemeFramework();
 
 ?>
